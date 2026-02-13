@@ -1,0 +1,153 @@
+// ======================================================
+// Typography System
+// Design Token Architecture
+// ======================================================
+
+
+// ------------------------------------------------------
+// 1️⃣ Breakpoint
+// ------------------------------------------------------
+
+$font-bp-md: 768px;
+
+
+// ------------------------------------------------------
+// 2️⃣ Heading Scale (Foundation Layer)
+// ------------------------------------------------------
+
+$heading-scale: (
+  1: (m: 48px, d: 60px, lh: 1.2),
+  2: (m: 40px, d: 48px, lh: 1.2),
+  3: (m: 36px, d: 40px, lh: 1.2),
+  4: (m: 32px, d: 36px, lh: 1.2),
+  5: (m: 28px, d: 32px, lh: 1.2),
+  6: (m: 24px, d: 28px, lh: 1.2)
+);
+
+
+// ------------------------------------------------------
+// 3️⃣ Paragraph Scale (Foundation Layer)
+// ------------------------------------------------------
+
+$paragraph-scale: (
+  l: (m: 24px, d: 24px, lh: 1.5),
+  m: (m: 20px, d: 20px, lh: 1.5),
+  r: (m: 16px, d: 16px, lh: 1.5),
+  s: (m: 14px, d: 14px, lh: 1.5)
+);
+
+
+// ------------------------------------------------------
+// 4️⃣ Semantic Typography Tokens (Component Layer)
+// ------------------------------------------------------
+
+$typography-tokens: (
+
+  // Page
+  page-title: (
+    scale: heading,
+    mobile-level: 2,
+    desktop-level: 1,
+    weight: 700
+  ),
+
+  page-subtitle: (
+    scale: heading,
+    mobile-level: 6,
+    desktop-level: 5,
+    weight: 700
+  ),
+
+  // Section
+  section-title: (
+    scale: heading,
+    mobile-level: 6,
+    desktop-level: 4,
+    weight: 700
+  ),
+
+  // Paragraph
+  body-lg: (
+    scale: paragraph,
+    mobile-level: l,
+    desktop-level: l,
+    weight: 400
+  ),
+
+  body: (
+    scale: paragraph,
+    mobile-level: r,
+    desktop-level: r,
+    weight: 400
+  ),
+
+  body-md: (
+    scale: paragraph,
+    mobile-level: m,
+    desktop-level: m,
+    weight: 400
+  ),
+);
+
+
+// ------------------------------------------------------
+// 5️⃣ Generator
+// ------------------------------------------------------
+
+@each $name, $settings in $typography-tokens {
+
+  $scale-type: map-get($settings, scale);
+  $mobile-level: map-get($settings, mobile-level);
+  $desktop-level: map-get($settings, desktop-level);
+  $weight: map-get($settings, weight);
+
+  $mobile-config: null;
+  $desktop-config: null;
+
+  // 取得 mobile 設定
+  @if $scale-type == heading {
+    $mobile-config: map-get($heading-scale, $mobile-level);
+    $desktop-config: map-get($heading-scale, $desktop-level);
+  } @else {
+    $mobile-config: map-get($paragraph-scale, $mobile-level);
+    $desktop-config: map-get($paragraph-scale, $desktop-level);
+  }
+
+  .t-#{$name} {
+    font-size: map-get($mobile-config, m);
+    line-height: map-get($mobile-config, lh);
+    font-weight: $weight;
+
+    @media (min-width: $font-bp-md) {
+      font-size: map-get($desktop-config, d);
+      line-height: map-get($desktop-config, lh);
+    }
+  }
+}
+
+
+// ------------------------------------------------------
+// 6️⃣ Optional: Pure Scale Utility (Debug / Rare Use)
+// ------------------------------------------------------
+
+@each $level, $config in $heading-scale {
+  .t-h-#{$level} {
+    font-size: map-get($config, m);
+    line-height: map-get($config, lh);
+
+    @media (min-width: $font-bp-md) {
+      font-size: map-get($config, d);
+    }
+  }
+}
+
+@each $level, $config in $paragraph-scale {
+  .t-p-#{$level} {
+    font-size: map-get($config, m);
+    line-height: map-get($config, lh);
+
+    @media (min-width: $font-bp-md) {
+      font-size: map-get($config, d);
+    }
+  }
+}
