@@ -1,6 +1,5 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
 import useMessage from "../hooks/useMessage";
 const VITE_API_BASE = import.meta.env.VITE_API_BASE;
 const VITE_API_PATH = import.meta.env.VITE_API_PATH;
@@ -14,7 +13,7 @@ function ProductModal({
     closeProductModal,
 }) {
     const [templateData, setTemplateData] = useState(templateProduct);
-    const { showMessage, showError } = useMessage();
+    const { showError, showSuccess } = useMessage();
     // 同步 templateProduct 到 templateData
     useEffect(() => {
         setTemplateData(templateProduct);
@@ -99,27 +98,24 @@ function ProductModal({
 
         // 整理產品資料
         const productData = {
-        data: {
-            ...templateData,
-            origin_price: Number(templateData.origin_price),
-            price: Number(templateData.price),
-            is_enabled: templateData.is_enabled ? 1 : 0,
-            // 防止 imagesUrl 為空陣列
-            imagesUrl: [...templateData.imagesUrl.filter((url) => url !== "")],
-        }
+            data: {
+                ...templateData,
+                origin_price: Number(templateData.origin_price),
+                price: Number(templateData.price),
+                is_enabled: templateData.is_enabled ? 1 : 0,
+                // 防止 imagesUrl 為空陣列
+                imagesUrl: [...templateData.imagesUrl.filter((url) => url !== "")],
+            }
         }
 
         try {
         // [method] 動態設定 axios 方法
         const response = await axios[method](url, productData);
-        // alert("產品更新成功");
-        // dispatch(createAsyncMessage(response.data));
-        showMessage(response.data.message);
+        showSuccess(response.data.message);
         getProducts(currentPage || 1);
         closeProductModal();
         } catch (error) {
-        // alert("產品更新失敗: " + error.response.data.message);
-        showError(error.response.data.message);
+        showError("產品更新失敗: " + (error.response?.data?.message || error.message));
         }
     };
 
@@ -127,11 +123,11 @@ function ProductModal({
     const deleteProduct = async (id) => {
         try {
         const response = await axios.delete(`${VITE_API_BASE}/api/${VITE_API_PATH}/admin/product/${id}`);
-        showMessage(response.data.message);
+        showSuccess(response.data.message);
         getProducts(currentPage || 1);
         closeProductModal();
         } catch (error) {
-        showError(error.response.data.message);
+        showError("產品刪除失敗: " + (error.response?.data?.message || error.message));
         }
     };
 
@@ -149,7 +145,7 @@ function ProductModal({
             imageUrl: response.data.imageUrl,
         }))
         } catch (error) {
-        showError(error.response.data.message);
+        showError("圖片上傳失敗: " + (error.response?.data?.message || error.message));
         }
     };
 
@@ -310,15 +306,6 @@ function ProductModal({
                                     <option key={cate} value={cate}>{cate}</option>
                                 ))}
                                 </select>
-                                {/* <label htmlFor="category" className="form-label">分類</label>
-                                <input
-                                id="category"
-                                type="text"
-                                className="form-control"
-                                placeholder="請輸入分類"
-                                value={templateData.category}
-                                onChange={(e) => handleModelInputChange(e)}
-                                /> */}
                             </div>
                         </div>
 
@@ -362,24 +349,65 @@ function ProductModal({
                         <hr />
 
                         <div className="mb-3">
-                        <label htmlFor="description" className="form-label">產品描述</label>
+                        <label htmlFor="description" className="form-label">商品描述</label>
                         <textarea
                             id="description"
                             className="form-control"
-                            placeholder="請輸入產品描述"
+                            placeholder="請輸入商品描述"
                             value={templateData.description}
                             onChange={(e) => handleModelInputChange(e)}
                             ></textarea>
                         </div>
                         <div className="mb-3">
-                        <label htmlFor="content" className="form-label">說明內容</label>
+                        <label htmlFor="content" className="form-label">商品介紹</label>
                         <textarea
                             id="content"
                             className="form-control"
-                            placeholder="請輸入說明內容"
+                            placeholder="請輸入商品介紹"
                             value={templateData.content}
                             onChange={(e) => handleModelInputChange(e)}
                             ></textarea>
+                        </div>
+                        <div className="mb-3">
+                        <label htmlFor="features" className="form-label">商品特色</label>
+                        <textarea
+                            id="features"
+                            className="form-control"
+                            placeholder="請輸入商品特色"
+                            value={templateData.features}
+                            onChange={(e) => handleModelInputChange(e)}
+                            ></textarea>
+                        </div>
+                        <div className="mb-3">
+                        <label htmlFor="specifications" className="form-label">商品規格</label>
+                        <textarea
+                            id="specifications"
+                            className="form-control"
+                            placeholder="請輸入商品規格"
+                            value={templateData.specifications}
+                            onChange={(e) => handleModelInputChange(e)}
+                            ></textarea>
+                        </div>
+                        <div className="mb-3">
+                        <label htmlFor="published_at" className="form-label">上架日期</label>
+                        <input
+                        id="published_at"
+                        type="date"
+                        className="form-control"
+                        value={templateData.published_at
+                            ? new Date(templateData.published_at).toISOString().substring(0, 10)
+                            : ""}
+                        onChange={e => {
+                            const dateStr = e.target.value; // "2026-02-28"
+                            const timestamp = dateStr ? new Date(dateStr).getTime() : "";
+                            handleModelInputChange({
+                            target: {
+                                id: "published_at",
+                                value: timestamp
+                            }
+                            });
+                        }}
+                        />
                         </div>
                         <div className="mb-3">
                             <div className="form-check">
@@ -392,6 +420,34 @@ function ProductModal({
                                 />
                                 <label className="form-check-label" htmlFor="is_enabled">
                                 是否啟用
+                                </label>
+                            </div>
+                        </div>
+                        <div className="mb-3">
+                            <div className="form-check">
+                                <input
+                                id="is_hot"
+                                className="form-check-input"
+                                type="checkbox"
+                                checked={Boolean(templateData.is_hot)}
+                                onChange={(e) => handleModelInputChange(e)}
+                                />
+                                <label className="form-check-label" htmlFor="is_hot">
+                                設為熱門商品
+                                </label>
+                            </div>
+                        </div>
+                        <div className="mb-3">
+                            <div className="form-check">
+                                <input
+                                id="is_new"
+                                className="form-check-input"
+                                type="checkbox"
+                                checked={Boolean(templateData.is_new)}
+                                onChange={(e) => handleModelInputChange(e)}
+                                />
+                                <label className="form-check-label" htmlFor="is_new">
+                                設為新品
                                 </label>
                             </div>
                         </div>

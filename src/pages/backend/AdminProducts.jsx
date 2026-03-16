@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import axios from 'axios'
 import * as bootstrap from "bootstrap";
 import ProductModal from '../../components/ProductModal';
@@ -20,6 +20,11 @@ const INITIAL_TEMPLATE_DATA = {
   imageUrl: "",
   imagesUrl: [],
   parentCategory: "",
+  features: "",
+  specifications: "",
+  is_hot: false,
+  is_new: false,
+  published_at: "",
 };
 
 function AdminProducts() {
@@ -79,10 +84,11 @@ function AdminProducts() {
   };
 
   const closeProductModal = () => {
+    console.log('closeProductModal', productModalRef.current);
     productModalRef.current.hide();
   };
 
-  const getProducts = async (page = 1) => {
+  const getProducts = useCallback(async (page = 1) => {
     try {
       const response = await axios.get(`${VITE_API_BASE}/api/${VITE_API_PATH}/admin/products?page=${page}`);
       setProducts(response.data.products);
@@ -93,14 +99,15 @@ function AdminProducts() {
       // alert("無法取得產品列表" + err.response.data.message);
       showError(err.response.data.message);
     }
-  }
+  }, [showError, showSuccess]);
 
 
 
   // 取得產品列表
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     getProducts();
-  }, []);
+  }, [getProducts]);
 
   return (
     <>
@@ -123,6 +130,7 @@ function AdminProducts() {
                 <th width="120">原價</th>
                 <th width="120">售價</th>
                 <th width="100">是否啟用</th>
+                <th width="120">發布日期</th>
                 <th width="120">編輯</th>
               </tr>
             </thead>
@@ -141,6 +149,7 @@ function AdminProducts() {
                     <span>未啟用</span>
                   )}
                 </td>
+                <td>{new Date(item.published_at).toLocaleDateString()}</td>
                 <td>
                   <div className="btn-group">
                     <button

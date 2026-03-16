@@ -21,7 +21,7 @@ function SingleProduct() {
                 data,
             );
             // console.log("加入購物車成功:", response.data);
-            navigate("/cart");
+            // navigate("/cart");
         } catch (error) {
             console.error("加入購物車失敗:", error);
         }
@@ -51,7 +51,26 @@ function SingleProduct() {
                                 </div>
                                 <div className="col-md-8 p-3">
                                     <h5 className="card-title">{filteredProduct.title}</h5>
-                                    <p className="card-text">{filteredProduct.description}</p>
+                                    {filteredProduct.description && (
+                                    <p className="card-text text-start">{filteredProduct.description.split('\n').map((line, index) => (
+                                        <span key={index}>{line}<br /></span>
+                                    ))}</p>
+                                    )}
+                                    {filteredProduct.content && (
+                                    <p className="card-text text-start">{filteredProduct.content.split('\n').map((line, index) => (
+                                        <span key={index}>{line}<br /></span>
+                                    ))}</p>
+                                    )}
+                                    {filteredProduct.features && (
+                                    <p className="card-text text-start">{filteredProduct.features.split('\n').map((line, index) => (
+                                        <span key={index}>{line}<br /></span>
+                                    ))}</p>
+                                    )}
+                                    {filteredProduct.specifications && (
+                                    <p className="card-text text-start">{filteredProduct.specifications.split('\n').map((line, index) => (
+                                        <span key={index}>{line}<br /></span>
+                                    ))}</p>
+                                    )}
                                     <p className="card-text"><strong>價格:</strong> {filteredProduct.price} 元</p>
                                     <p className="card-text"><small className="text-muted">單位: {filteredProduct.unit}</small></p>
                                     <button
