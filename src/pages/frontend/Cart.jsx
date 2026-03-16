@@ -40,6 +40,8 @@ function Cart() {
                     qty: qty
                 }
             }
+            const response = await axios.put(`${VITE_API_BASE}/api/${VITE_API_PATH}/cart/${cartId}`, data);
+            console.log("更新購物車成功:", response.data);
             getCart();
         } catch (error) {
             console.error("更新購物車失敗:", error);
@@ -50,7 +52,7 @@ function Cart() {
     const deleteCart = async (cartId) => {
         try {
             const response = await axios.delete(`${VITE_API_BASE}/api/${VITE_API_PATH}/cart/${cartId}`);
-            // console.log("刪除購物車成功:", response.data);
+            console.log("刪除購物車成功:", response.data);
             // 更新購物車列表
             getCart();
         } catch (error) {
@@ -62,7 +64,7 @@ function Cart() {
     const clearCart = async () => {
         try {
             const response = await axios.delete(`${VITE_API_BASE}/api/${VITE_API_PATH}/carts`);
-            // console.log("清空購物車成功:", response.data);
+            console.log("清空購物車成功:", response.data);
             // 更新購物車列表
             const responses2 = await axios.get(`${VITE_API_BASE}/api/${VITE_API_PATH}/cart`);
             // console.log("取得購物車列表成功:", responses2.data.data);

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import axios from 'axios'
 import { useForm } from "react-hook-form";
 import { emailValidation } from "../utils/validation";
@@ -6,13 +5,8 @@ import { useNavigate } from "react-router";
 const VITE_API_BASE = import.meta.env.VITE_API_BASE;
 const VITE_API_PATH = import.meta.env.VITE_API_PATH;
 
-function Login( getProducts, setIsAuth ) {
-    // const [formData, setFormData] = useState({
-    //     username: "",
-    //     password: "",
-    // });
+function Login() {
     const navigate = useNavigate();
-
     const {
         register,
         handleSubmit,
@@ -25,27 +19,18 @@ function Login( getProducts, setIsAuth ) {
         }
     });
 
-    // const handleInputChange = (e) => {
-    //     const { id, value } = e.target;
-    //     setFormData((prevData) => ({
-    //     ...prevData,
-    //     [id]: value,
-    //     }));
-    // };
-
     const onSubmit = async (formData) => {
         try {
         const response = await axios.post(`${VITE_API_BASE}/admin/signin`, formData);
         console.log("登入成功:", response.data);
         const { token, expired } = response.data;
-        document.cookie = `hexToken=${token};expires=${new Date(expired)};`;
-        axios.defaults.headers.common.Authorization = token;
-        // getProducts();
-        // setIsAuth(true);
-        // alert("登入成功: " + response.data.message);
+        const setCookie = (token, expired) => {
+            document.cookie = `hexToken=${token};expires=${new Date(expired)};`;
+            axios.defaults.headers.common.Authorization = token;
+        };
+        setCookie(token, expired);
         navigate("/admin/product");
         } catch (error) {
-        // setIsAuth(false);message);
         alert("登入失敗: " + (error.response?.data?.message || error.message));
         }
     };

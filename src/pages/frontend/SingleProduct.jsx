@@ -1,12 +1,11 @@
 import axios from "axios";
 import useProducts from "../../hooks/useProducts";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 const VITE_API_BASE = import.meta.env.VITE_API_BASE;
 const VITE_API_PATH = import.meta.env.VITE_API_PATH;
 function SingleProduct() {
     const params = useParams();
     const { id } = params;
-    const navigate = useNavigate();
     const { products, loading, error } = useProducts();
     const addCart = async (id, qty = 1) => {
         try {
@@ -20,8 +19,7 @@ function SingleProduct() {
                 `${VITE_API_BASE}/api/${VITE_API_PATH}/cart`,
                 data,
             );
-            // console.log("加入購物車成功:", response.data);
-            // navigate("/cart");
+            console.log("加入購物車成功:", response.data);
         } catch (error) {
             console.error("加入購物車失敗:", error);
         }
